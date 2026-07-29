@@ -4,21 +4,23 @@ description: >
   MasterGo Vibe MCP 集成。当用户要求在 MasterGo 画布上设计、绘制、
   生成页面、读取图层代码、修改组件、管理变量时使用。自动检测 MCP
   连接状态，未配置时引导一键安装，配置完成后提供完整的工具调用能力。
-  支持私域版 MasterGo（如 mastergo.dongfeng-nissan.com.cn）。
+  支持私域版 MasterGo（如 mastergo.private.example.com）。
 ---
 
 # MasterGo Vibe MCP Skill
 
 此 skill 封装了 MasterGo Vibe MCP（@mastergo/vibe-mcp v1.0.18）的完整配置和调用流程。
 
+默认示例以 Codex 为 Agent 客户端，但本 skill 的 MCP 工作流也适用于 Claude Code 及其他支持 MCP 的 Agent 客户端。具体配置入口以客户端的 MCP 配置方式为准；本 skill 自带的 Codex 配置脚本主要面向 Codex Desktop，并同时提供通用 MCP JSON 配置。
+
 > Skill 版本：**1.1** (2026-07-10T14:30:00+08:00)
 
 ## 操作原则
 
-1. **官方文档先行**：本 skill 以 MasterGo MCP 官方文档（https://mastergo.com/help/MG/MCP）为第一参考源。当遇到配置、安装、使用问题或工具调用异常时，优先从官方文档查询方法，并告诉用户信息来自官方文档。
+1. **官方文档先行**：本 skill 以 MasterGo MCP 官方文档（https://mastergo.com/help/MG/MCP/VIBE）为第一参考源。当遇到配置、安装、使用问题或工具调用异常时，优先从官方文档查询方法，并告诉用户信息来自官方文档。
 2. **信息来源透明**：所有操作建议应说明信息是通过官方文档直接获取、从 skill 经验中得出、还是通过浏览器/API 主动查询得到的。不准确认的信息不提。
 3. **风险操作前确认**：涉及写文件（如修改 `~/.codex/config.toml`、`.mcp.json`）、杀进程（`kill <PID>`）、安装包（`brew install`、`npm install`）等可能影响用户环境稳定性的操作，需先告知意图、预期效果和潜在风险，等待用户确认后执行。
-4. **稳定优先，标准为桥**：优先使用 Codex 原生 MCP、官方 npm 包、标准配置文件路径等官方或业界通用的方式完成任务。非标准绕过手段（如管道 JSON-RPC 调用）仅在标准路径受阻且无修复手段时作为临时兜底，并告知用户局限性。
+4. **稳定优先，标准为桥**：优先使用当前 Agent 客户端的原生 MCP、官方 npm 包、标准配置文件路径等官方或业界通用的方式完成任务。非标准绕过手段（如管道 JSON-RPC 调用）仅在标准路径受阻且无修复手段时作为临时兜底，并告知用户局限性。
 5. **报告来源与兜底**：如果某种方法从官方文档学到但实际执行未生效，诚实告知用户"官方文档说明此方法，但当前环境未能生效"，再切换为非标准的替代方案。
 
 ## 何时触发
@@ -52,7 +54,7 @@ description: >
 
 2. 辅助检查 MCP server 注册状态：
    - 可以调用 list_mcp_resources(server="mastergo")
-   - 如果返回 `unknown MCP server`，说明 Codex 当前会话没有加载 mastergo server
+   - 如果返回 `unknown MCP server`，说明当前 Agent 会话没有加载 mastergo server
    - 如果返回 `Method not found`，不代表故障；MasterGo Vibe MCP 不实现 resources/list，但原生工具可能已正常暴露
 
 3. 如果原生工具未暴露：
@@ -88,9 +90,9 @@ bash scripts/setup-mastergo-mcp.sh --yes
 - 脚本只检查 Node.js/npx，不自动运行 `brew install` 或全局 `npm install`。缺少依赖时向用户解释并另行请求安装许可。
 - 脚本对变更文件创建时间戳备份并原子写入；无变化时不创建备份。
 
-写入后需要完全退出并重启 Codex 才能生效。
+写入后需要完全退出并重启对应的 Agent 客户端才能生效。
 
-**配置完成后，必须让 Codex 重新加载 MCP 配置**：通常需要完全退出并重启 Codex。重启后用 `tool_search("mastergo")` 或 `mcp__mastergo__get_version` 验证原生 MCP 工具是否暴露；不要把 `list_mcp_resources(server="mastergo")` 的 `Method not found` 当成失败。
+**配置完成后，必须让对应的 Agent 客户端重新加载 MCP 配置**：通常需要完全退出并重启客户端。重启后用 `tool_search("mastergo")` 或 `mcp__mastergo__get_version` 验证原生 MCP 工具是否暴露；不要把 `list_mcp_resources(server="mastergo")` 的 `Method not found` 当成失败。
 
 #### 官方 MCP 类型区分
 
@@ -99,7 +101,7 @@ bash scripts/setup-mastergo-mcp.sh --yes
 
 ### 阶段 2：管道调用工具（自动修复失败时的后备方案）
 
-仅当 Codex 原生 MCP 工具没有暴露（`tool_search("mastergo")` 找不到 `mcp__mastergo` 命名空间，或 `mcp__mastergo__get_version` 不可调用）时，才使用管道直接调用。每次调用都是一个独立的 exec_command：
+仅当当前 Agent 客户端的原生 MCP 工具没有暴露（`tool_search("mastergo")` 找不到 `mcp__mastergo` 命名空间，或 `mcp__mastergo__get_version` 不可调用）时，才使用管道直接调用。每次调用都是一个独立的 exec_command：
 
 ```bash
 export PATH="/opt/homebrew/bin:$PATH"

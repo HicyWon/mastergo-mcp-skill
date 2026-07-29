@@ -1,6 +1,6 @@
 # MasterGo MCP Skill
 
-用于在 Codex 中连接并操作 MasterGo Vibe MCP 画布的 skill。
+用于在 Codex、Claude Code 以及其他支持 MCP 的 Agent 客户端中连接并操作 MasterGo Vibe MCP 画布的 skill。
 
 [GitHub 仓库](https://github.com/HicyWon/mastergo-mcp-skill) · [MasterGo MCP 官方文档](https://mastergo.com/help/MG/MCP/VIBE)
 
@@ -17,7 +17,7 @@
 
 ## 功能概览
 
-这个 skill 可以帮助 Codex：
+这个 skill 可以帮助 Codex、Claude Code 以及其他支持 MCP 的 Agent 客户端：
 
 - 检查 MasterGo MCP 连接状态和版本
 - 配置 Codex Desktop 的 MasterGo MCP
@@ -32,7 +32,7 @@
 - 查看本地设计与画布之间的差异
 - 将设计同步到画布
 
-支持 MasterGo Vibe MCP，也支持私域 MasterGo 环境，例如 `mastergo.dongfeng-nissan.com.cn`。
+支持 MasterGo Vibe MCP，也支持私域 MasterGo 环境，例如 `mastergo.private.example.com`。
 
 > 本 skill 默认针对 Vibe MCP，不负责 Magic MCP、DSL 或 D2C 场景。
 
@@ -99,6 +99,8 @@ http://localhost:50678
 bash mastergo-mcp/scripts/setup-mastergo-mcp.sh --yes --port 50678
 ```
 
+脚本主要面向 Codex Desktop，同时提供通用 MCP JSON 配置。Claude Code 等其他支持 MCP 的客户端可以复用本 skill 的工作流，具体配置入口请以对应客户端的 MCP 配置方式为准。
+
 脚本会更新：
 
 ```text
@@ -106,54 +108,24 @@ bash mastergo-mcp/scripts/setup-mastergo-mcp.sh --yes --port 50678
 ~/.codex/.mcp.json
 ```
 
-脚本会保留其他 MCP 配置，并在修改前创建带时间戳的备份。配置完成后，需要完全退出并重新启动 Codex。
+脚本会保留其他 MCP 配置，并在修改前创建带时间戳的备份。配置完成后，需要完全退出并重新启动对应的 Agent 客户端。
 
 ## 使用方法
 
-### 检查连接
+使用前请打开 MasterGo 文件或画布，并确认 MCP 已连接。以下示例中的引号内容就是可以直接输入给 Agent 的指令。
 
-```text
-检查 MasterGo MCP 是否连接正常。
-```
-
-也可以检查版本：
-
-```text
-获取当前 MasterGo MCP 版本。
-```
-
-### 生成页面
-
-1. 打开 MasterGo 文件或画布。
-2. 确认 MasterGo MCP 已连接。
-3. 描述页面需求。
-4. 生成后用图层读取或截图能力进行复核。
-
-示例：
-
-```text
-在当前 MasterGo 画布中生成一个新能源汽车设置页，包含车辆状态、续航信息、充电入口和底部导航。
-```
-
-### 读取和修改图层
-
-读取当前选中图层：
-
-```text
-读取当前选中的 MasterGo 图层结构。
-```
-
-修改图层：
-
-```text
-将当前选中卡片的标题改为“车辆状态”，把内边距调整为 16px，圆角调整为 8px。
-```
-
-导出前端代码：
-
-```text
-导出当前选中图层的前端代码，使用 HTML 格式。
-```
+| 使用场景 | 可以做什么 | 用户输入示例 |
+| --- | --- | --- |
+| 检查连接 | 检查 MCP 是否在线、获取版本 | “检查 MasterGo MCP 是否连接正常”<br>“获取当前 MasterGo MCP 版本” |
+| 生成页面 | 根据自然语言需求在画布中生成页面 | “在当前 MasterGo 画布中生成一个登录页面，包含手机号输入框、验证码输入框、登录按钮和隐私协议入口” |
+| 生成复杂界面 | 创建完整业务页面或车机界面 | “在当前 MasterGo 画布中生成一个新能源汽车设置页，包含车辆状态、续航信息、充电入口和底部导航” |
+| 读取图层 | 查看当前选中图层的结构和属性 | “读取当前选中的 MasterGo 图层结构” |
+| 修改图层 | 修改文本、样式和局部结构 | “将当前选中卡片的标题改为‘车辆状态’，把内边距调整为 16px，圆角调整为 8px” |
+| 替换或删除 | 替换图层内容或删除指定节点 | “把当前选中的图标替换为充电图标”<br>“删除当前选中的辅助说明文本” |
+| 导出代码 | 将画布图层转换为前端代码 | “导出当前选中图层的前端代码，使用 HTML 格式” |
+| 获取截图 | 获取当前画布或节点的视觉预览 | “获取当前选中图层的截图” |
+| 设计变量 | 读取或更新颜色、字号等设计变量 | “读取当前文件的设计变量”<br>“将主色变量更新为 #1677FF” |
+| 组件和资源 | 查询组件信息、团队库和设计差异 | “列出当前可用的团队组件库”<br>“对比本地设计与画布之间的差异” |
 
 如果使用管道兜底模式，`get_selection_node` 和 `get_frontend_code` 必须提供 `projectDir`。
 
@@ -161,7 +133,7 @@ bash mastergo-mcp/scripts/setup-mastergo-mcp.sh --yes --port 50678
 
 ### 原生 MCP 模式（推荐）
 
-当 Codex 已加载 `mcp__mastergo` 工具时，优先使用原生模式。该模式下页面生成、组件创建、设计同步和画布写入能力最完整、最可靠。
+当当前 Agent 客户端已加载 `mcp__mastergo` 工具时，优先使用原生模式。该模式下页面生成、组件创建、设计同步和画布写入能力最完整、最可靠。
 
 可以通过以下方式验证：
 
@@ -190,74 +162,18 @@ mcp__mastergo__get_version
 
 ## 常见故障处理
 
-### 找不到 `mcp__mastergo` 工具
+| 症状 | 常见原因 | 处理方法 |
+| --- | --- | --- |
+| 找不到 `mcp__mastergo` 工具 | MCP 配置未加载，或配置后没有重启 Agent 客户端 | 检查 `~/.codex/config.toml` 是否存在 `[mcp_servers.mastergo]`；确认 `@mastergo/vibe-mcp` 配置正确；完全重启客户端；使用 `tool_search("mastergo")` 或 `mcp__mastergo__get_version` 验证 |
+| `list_mcp_resources` 返回 `Method not found` | Vibe MCP 可能不提供 `resources/list` 方法 | 不一定是故障；只要 `mcp__mastergo__get_version` 或其他 `mcp__mastergo__...` 工具可用，就可以继续使用 |
+| `npx` 不存在 | 未安装 Node.js 或 Node.js 未加入 PATH | 安装 Node.js 18+：`brew install node`，或从 [Node.js 官网](https://nodejs.org/) 安装 |
+| `mgmcp` 没有运行 | MasterGo 文件未打开，或连接尚未建立 | 打开 MasterGo 客户端或连接的 Chrome 中的目标文件；执行 `lsof -i :50678` 检查端口 |
+| 工具调用成功但画布没有变化 | `mgmcp` 长时间运行后状态异常，或使用了管道模式下不可靠的写入工具 | 执行 `lsof -i :50678 \| grep mgmcp` 找到进程，执行 `kill <mgmcp_PID>` 后重启 MasterGo 和 Agent 客户端；优先使用原生 MCP 模式 |
+| `NoSelection` | 当前没有选中图层 | 在 MasterGo 中选中图层或根节点，或提供节点 ID，例如“读取节点 19:361 的结构” |
+| `no online mg canvas` | MCP 已启动，但没有连接到在线画布 | 确认目标文件已在 MasterGo 客户端中打开且可编辑；确认使用的是 MCP 支持的客户端或 Chrome 环境；必要时重启 MasterGo 和 `mgmcp` |
+| 前端代码导出失败 | 未选中图层、节点 ID 错误，或缺少 `projectDir` | 选中目标图层并确认节点 ID；管道模式下为 `get_frontend_code` 传入 `projectDir` |
 
-可能原因是 Codex 没有加载 MCP 配置，或配置后没有重启。
-
-处理步骤：
-
-1. 检查 `~/.codex/config.toml` 是否存在 `[mcp_servers.mastergo]`。
-2. 确认 `@mastergo/vibe-mcp` 配置正确。
-3. 完全退出并重新打开 Codex。
-4. 使用 `tool_search("mastergo")` 或 `mcp__mastergo__get_version` 验证。
-
-### `list_mcp_resources` 返回 `Method not found`
-
-这不一定是故障。MasterGo Vibe MCP 可能不提供 `resources/list` 方法。只要 `mcp__mastergo__get_version` 或其他 `mcp__mastergo__...` 工具可用，就可以继续使用。
-
-### `npx` 不存在
-
-安装 Node.js 18 或更高版本：
-
-```bash
-brew install node
-```
-
-也可以从 [Node.js 官网](https://nodejs.org/) 下载。此 skill 不会自动安装 Node.js。
-
-### `mgmcp` 没有运行
-
-先打开 MasterGo 客户端或连接的 Chrome 中的目标文件，然后检查：
-
-```bash
-lsof -i :50678
-```
-
-如果没有监听，重新打开 MasterGo 文件并等待连接建立。
-
-### 工具调用成功，但画布没有变化
-
-可能是 `mgmcp` 长时间运行后状态异常。检查并重启进程：
-
-```bash
-lsof -i :50678 | grep mgmcp
-kill <mgmcp_PID>
-```
-
-然后完全退出并重新打开 MasterGo 客户端，再重启 Codex。仅刷新浏览器页面通常不会重启 `mgmcp`。
-
-### `NoSelection`
-
-说明当前没有选中图层。请在 MasterGo 中选中一个图层或根节点，也可以直接提供目标节点 ID：
-
-```text
-读取节点 19:361 的结构。
-```
-
-### `no online mg canvas`
-
-说明 MCP 已启动，但没有连接到在线 MasterGo 画布。请确认：
-
-- 目标文件已在 MasterGo 客户端中打开
-- 文件处于可编辑状态
-- 使用的是 MCP 支持的 MasterGo 客户端或 Chrome 环境
-- 必要时重启 MasterGo 和 `mgmcp`
-
-仅在 Codex 内置浏览器中看到页面，不一定代表 `mgmcp` 已连接到该画布。
-
-### 前端代码导出失败
-
-请确认当前已选中图层、目标节点 ID 正确，并且在管道模式下传入了 `projectDir`。
+仅在 Agent 客户端的内置浏览器中看到 MasterGo 页面，不一定代表 `mgmcp` 已连接到该画布。
 
 ## 安全与操作原则
 
@@ -280,6 +196,7 @@ kill <mgmcp_PID>
 │   ├── agents/openai.yaml
 │   └── scripts/setup-mastergo-mcp.sh
 ├── README.md
+├── agents.md
 ├── LICENSE
 └── .gitignore
 ```
