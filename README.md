@@ -6,8 +6,6 @@ A skill for connecting Codex, Claude Code, and other MCP-compatible agent client
 
 [GitHub 仓库](https://github.com/HicyWon/mastergo-mcp-skill) · [MasterGo MCP 官方文档](https://mastergo.com/help/MG/MCP/VIBE)
 
-本仓库同时提供 [Image to UI Skill](image-to-ui/README.md)，用于将 UI 参考图恢复为可编辑的 UI IR、HTML 预览和画布源文件。
-
 ## 目录
 
 - [功能概览](#功能概览)

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Image to UI"
-  short_description: "拆解 AI UI 图并生成可编辑画布源文件"
-  default_prompt: "使用 $image-to-ui 锁定 UI 参考图，提交逐项拆解供我确认，再从同一份 canonical UI IR 和真实资产包生成自包含 HTML 或可编辑画布。"
