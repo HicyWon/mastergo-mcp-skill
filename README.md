@@ -2,6 +2,8 @@
 
 用于在 Codex、Claude Code 以及其他支持 MCP 的 Agent 客户端中连接并操作 MasterGo Vibe MCP 画布的 skill。
 
+A skill for connecting Codex, Claude Code, and other MCP-compatible agent clients to read, generate, modify, and synchronize MasterGo Vibe MCP canvases.
+
 [GitHub 仓库](https://github.com/HicyWon/mastergo-mcp-skill) · [MasterGo MCP 官方文档](https://mastergo.com/help/MG/MCP/VIBE)
 
 ## 目录
