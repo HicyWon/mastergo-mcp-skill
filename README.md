@@ -56,31 +56,27 @@
 
 ## 下载与安装
 
-### 直接下载资源包
+### 下载
 
-可以直接下载 GitHub 源码压缩包：
+[下载源代码 ZIP](https://github.com/HicyWon/mastergo-mcp-skill/archive/refs/heads/main.zip)
 
-[下载最新源码 ZIP](https://github.com/HicyWon/mastergo-mcp-skill/archive/refs/heads/main.zip)
-
-当前仓库暂未创建 GitHub Release 或 Packages，这不影响用户直接下载源码 ZIP 或使用下面的命令获取 skill；该链接始终指向 `main` 分支的最新版本。
-
-也可以使用 Git 克隆：
+或使用 Git 克隆：
 
 ```bash
 git clone --depth 1 https://github.com/HicyWon/mastergo-mcp-skill.git
 ```
 
-skill 位于下载内容中的：
+Skill 位于仓库中的：
 
 ```text
 mastergo-mcp/
 ```
 
-该目录必须作为一个整体安装，因为其中包含 `SKILL.md`、Agent 显示配置和 MCP 配置脚本。
+请将该目录作为整体安装。
 
 ### Codex 直接安装
 
-如果本机已安装 Codex skill installer，可以直接执行：
+使用 Codex skill installer 安装：
 
 ```bash
 python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
@@ -88,13 +84,11 @@ python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-githu
   --path mastergo-mcp
 ```
 
-安装完成后，在 Codex 中提到 MasterGo、MCP 或画布操作即可触发此 skill。
+安装完成后即可在 Codex 中使用此 skill。
 
 ### Claude Code 和其他 Agent 客户端
 
-Claude Code 以及其他支持 skill / MCP 的 Agent 客户端可以先使用 `git clone` 或源码 ZIP 获取资源，再按照对应客户端的 skill 安装规则，将完整的 `mastergo-mcp` 目录放入客户端的 skills 目录。
-
-不同客户端的 skills 目录和自动安装命令可能不同，本仓库不假设 Claude Code 或其他 Agent 客户端使用 Codex 的目录结构。安装 skill 后，还需要按照客户端的 MCP 配置方式接入 `@mastergo/vibe-mcp`。
+获取仓库后，将 `mastergo-mcp/` 安装至客户端的 skills 目录，并按照客户端的 MCP 配置方式注册 `@mastergo/vibe-mcp`。
 
 ## 安装与配置
 
