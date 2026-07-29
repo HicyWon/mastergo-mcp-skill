@@ -162,18 +162,191 @@ mcp__mastergo__get_version
 
 ## 常见故障处理
 
-| 症状 | 常见原因 | 处理方法 |
-| --- | --- | --- |
-| 找不到 `mcp__mastergo` 工具 | MCP 配置未加载，或配置后没有重启 Agent 客户端 | 检查 `~/.codex/config.toml` 是否存在 `[mcp_servers.mastergo]`；确认 `@mastergo/vibe-mcp` 配置正确；完全重启客户端；使用 `tool_search("mastergo")` 或 `mcp__mastergo__get_version` 验证 |
-| `list_mcp_resources` 返回 `Method not found` | Vibe MCP 可能不提供 `resources/list` 方法 | 不一定是故障；只要 `mcp__mastergo__get_version` 或其他 `mcp__mastergo__...` 工具可用，就可以继续使用 |
-| `npx` 不存在 | 未安装 Node.js 或 Node.js 未加入 PATH | 安装 Node.js 18+：`brew install node`，或从 [Node.js 官网](https://nodejs.org/) 安装 |
-| `mgmcp` 没有运行 | MasterGo 文件未打开，或连接尚未建立 | 打开 MasterGo 客户端或连接的 Chrome 中的目标文件；执行 `lsof -i :50678` 检查端口 |
-| 工具调用成功但画布没有变化 | `mgmcp` 长时间运行后状态异常，或使用了管道模式下不可靠的写入工具 | 执行 `lsof -i :50678 \| grep mgmcp` 找到进程，执行 `kill <mgmcp_PID>` 后重启 MasterGo 和 Agent 客户端；优先使用原生 MCP 模式 |
-| `NoSelection` | 当前没有选中图层 | 在 MasterGo 中选中图层或根节点，或提供节点 ID，例如“读取节点 19:361 的结构” |
-| `no online mg canvas` | MCP 已启动，但没有连接到在线画布 | 确认目标文件已在 MasterGo 客户端中打开且可编辑；确认使用的是 MCP 支持的客户端或 Chrome 环境；必要时重启 MasterGo 和 `mgmcp` |
-| 前端代码导出失败 | 未选中图层、节点 ID 错误，或缺少 `projectDir` | 选中目标图层并确认节点 ID；管道模式下为 `get_frontend_code` 传入 `projectDir` |
+### 1. 找不到 `mcp__mastergo` 工具
 
-仅在 Agent 客户端的内置浏览器中看到 MasterGo 页面，不一定代表 `mgmcp` 已连接到该画布。
+可能原因：
+
+- Agent 客户端没有加载 MCP 配置
+- 只配置了通用 `.mcp.json`，但 Codex Desktop 没有读取到
+- 配置完成后没有完全重启 Agent 客户端
+
+处理方式：
+
+1. 检查 Codex Desktop 配置文件：
+
+   ```text
+   ~/.codex/config.toml
+   ```
+
+2. 确认文件中存在以下配置段：
+
+   ```toml
+   [mcp_servers.mastergo]
+   ```
+
+3. 确认 `@mastergo/vibe-mcp` 配置正确。
+4. 完全退出并重新打开对应的 Agent 客户端。
+5. 重启后使用以下方式验证：
+
+   ```text
+   tool_search("mastergo")
+   ```
+
+   或：
+
+   ```text
+   mcp__mastergo__get_version
+   ```
+
+Claude Code 等其他支持 MCP 的客户端，应检查该客户端自己的 MCP 配置入口，而不是只检查 Codex 的配置文件。
+
+### 2. `list_mcp_resources` 返回 `Method not found`
+
+这不一定是故障。
+
+MasterGo Vibe MCP 可能不提供 `resources/list` 方法，因此执行以下检查时可能返回：
+
+```text
+Method not found
+```
+
+只要以下工具能够调用，就说明 MasterGo MCP 基本可用：
+
+```text
+mcp__mastergo__get_version
+```
+
+或其他：
+
+```text
+mcp__mastergo__...
+```
+
+不要单独把 `list_mcp_resources` 的 `Method not found` 判断为连接失败。
+
+### 3. `npx` 不存在
+
+可能原因是没有安装 Node.js，或者 Node.js 没有加入系统 PATH。
+
+安装 Node.js 18 或更高版本：
+
+```bash
+brew install node
+```
+
+也可以从 [Node.js 官网](https://nodejs.org/) 下载并安装。
+
+安装后检查：
+
+```bash
+node -v
+npx --version
+```
+
+本 skill 不会自动安装 Node.js、Homebrew 或全局 npm 包。
+
+### 4. `mgmcp` 没有运行
+
+可能原因：
+
+- MasterGo 客户端没有打开
+- MasterGo 文件没有打开
+- 当前文件没有建立 MCP 连接
+- 连接使用的客户端或浏览器不是 MCP 支持的环境
+
+处理方式：
+
+1. 打开 MasterGo 客户端，或在连接的 Chrome 中打开 MasterGo 文件。
+2. 确认文件处于可编辑状态。
+3. 检查默认端口是否有服务监听：
+
+   ```bash
+   lsof -i :50678
+   ```
+
+4. 如果没有监听，重新打开 MasterGo 文件并等待连接建立。
+
+### 5. 工具调用成功，但画布没有变化
+
+可能原因：
+
+- `mgmcp` 长时间运行后连接状态异常
+- 使用了管道模式下不可靠的写入工具
+- 写入操作实际没有落到目标画布
+
+先检查 `mgmcp` 进程：
+
+```bash
+lsof -i :50678 | grep mgmcp
+```
+
+如果确认进程状态异常：
+
+```bash
+kill <mgmcp_PID>
+```
+
+然后按以下顺序恢复：
+
+1. 完全退出 MasterGo 客户端。
+2. 重新打开 MasterGo 客户端和目标文件。
+3. 完全退出并重新打开 Agent 客户端。
+4. 再次检查 MCP 版本和连接状态。
+
+仅刷新浏览器页面通常不会重启 `mgmcp`。
+
+如果使用的是管道模式，优先使用 `agent_update_node` 进行局部修改，并在写入后用 `get_selection_node` 复核。`design_page`（带 `code` 参数）、`submit_page_to_canvas`、`agent_create_component` 和 `agent_sync_design` 在管道模式下存在可靠性限制；条件允许时应切换到原生 MCP 模式。
+
+### 6. `NoSelection`
+
+这表示当前没有选中图层。
+
+处理方式：
+
+1. 在 MasterGo 中选中一个图层或根节点。
+2. 重新执行读取或修改操作。
+
+也可以直接提供目标节点 ID，例如：
+
+```text
+读取节点 19:361 的结构。
+```
+
+### 7. `no online mg canvas`
+
+这表示 MCP 进程可能已经启动，但没有连接到在线 MasterGo 画布。
+
+请依次确认：
+
+- 目标文件已在 MasterGo 客户端中打开
+- 文件处于可编辑状态
+- 使用的是 MCP 支持的 MasterGo 客户端或 Chrome 环境
+- MasterGo 文件没有断开或失去连接
+- 必要时已重启 MasterGo 和 `mgmcp`
+
+仅在 Agent 客户端的内置浏览器中看到 MasterGo 页面，不一定代表 `mgmcp` 已连接到该画布。某些环境要求在 MasterGo 客户端或指定的 Chrome 会话中打开同一个文件。
+
+### 8. 前端代码导出失败
+
+可能原因：
+
+- 当前没有选中图层
+- 目标节点 ID 不正确
+- 管道模式下缺少 `projectDir`
+- 目标画布当前不在线
+
+处理方式：
+
+1. 在 MasterGo 中选中需要导出的图层。
+2. 确认目标节点 ID。
+3. 确认当前画布处于在线状态。
+4. 管道模式下，为 `get_frontend_code` 传入 `projectDir`。
+
+可以直接输入：
+
+```text
+导出当前选中图层的前端代码，使用 HTML 格式。
+```
 
 ## 安全与操作原则
 
