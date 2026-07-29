@@ -2,7 +2,7 @@
 
 用于在 Codex 中连接并操作 MasterGo Vibe MCP 画布的 skill。
 
-[GitHub 仓库](https://github.com/HicyWon/mastergo-mcp-skill) · [MasterGo MCP 官方文档](https://mastergo.com/help/MG/MCP)
+[GitHub 仓库](https://github.com/HicyWon/mastergo-mcp-skill) · [MasterGo MCP 官方文档](https://mastergo.com/help/MG/MCP/VIBE)
 
 ## 目录
 
@@ -269,7 +269,7 @@ kill <mgmcp_PID>
 - 修改或删除画布变量
 - 对画布执行写入操作
 
-遇到配置、安装或调用异常时，优先参考 [MasterGo MCP 官方文档](https://mastergo.com/help/MG/MCP)，并明确说明信息来源。
+遇到配置、安装或调用异常时，优先参考 [MasterGo MCP 官方文档](https://mastergo.com/help/MG/MCP/VIBE)，并明确说明信息来源。
 
 ## 项目结构
 
