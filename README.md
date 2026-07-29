@@ -105,7 +105,7 @@ Claude Code 以及其他支持 skill / MCP 的 Agent 客户端可以先使用 `g
 - Node.js 18 或更高版本
 - `npx`
 - 首次建立连接时，需要安装并启动 MasterGo 桌面客户端
-- 建立本地连接后，可以在 MasterGo Web 客户端中打开目标文件
+- 建立本地连接后，可以在 MasterGo 桌面客户端或 Web 客户端中打开目标文件
 
 ### 首次连接说明
 
@@ -115,7 +115,7 @@ Claude Code 以及其他支持 skill / MCP 的 Agent 客户端可以先使用 `g
 http://localhost:50678
 ```
 
-本地服务建立后，不需要再在 MasterGo 桌面客户端中打开目标文件。可以直接在 MasterGo Web 客户端中打开目标文件，并确认页面显示“**MCP 服务端启动并已连接**”，之后即可继续使用 Vibe MCP。
+本地服务建立后，目标文件可以在 MasterGo 桌面客户端或 Web 客户端中打开。当前环境的实测方式是在 MasterGo Web 客户端中打开目标文件，并确认页面显示“**MCP 服务端启动并已连接**”，之后即可继续使用 Vibe MCP。
 
 > 以上是当前环境的实测使用方式。MasterGo MCP 服务在桌面客户端、Web 客户端和本地端口之间的具体生命周期机制，官方文档尚未完整说明；如果连接异常，仍建议重新打开桌面客户端进行初始化。
 
@@ -170,7 +170,7 @@ bash mastergo-mcp/scripts/setup-mastergo-mcp.sh --yes --port 50678
 
 ## 使用方法
 
-首次使用请先按“首次连接说明”建立本地 MCP 服务；之后在 MasterGo Web 客户端打开目标文件，并确认 MCP 已连接。以下示例中的引号内容就是可以直接输入给 Agent 的指令。
+首次使用请先按“首次连接说明”建立本地 MCP 服务；之后可以在 MasterGo 桌面客户端或 Web 客户端打开目标文件，并确认 MCP 已连接。以下示例中的引号内容就是可以直接输入给 Agent 的指令。
 
 | 使用场景 | 可以做什么 | 用户输入示例 |
 | --- | --- | --- |
@@ -309,7 +309,7 @@ npx --version
 
 - 首次使用时，MasterGo 桌面客户端尚未启动本地 MCP 服务
 - 本地服务尚未建立，`http://localhost:50678` 尚未生成或未监听
-- MasterGo Web 客户端中的目标文件尚未建立 MCP 连接
+- MasterGo 桌面客户端或 Web 客户端中的目标文件尚未建立 MCP 连接
 - 连接使用的 Agent 客户端或浏览器不是 MCP 支持的环境
 
 处理方式：
@@ -321,7 +321,7 @@ npx --version
    lsof -i :50678
    ```
 
-3. 在 MasterGo Web 客户端中打开目标文件。
+3. 在 MasterGo 桌面客户端或 Web 客户端中打开目标文件。
 4. 确认页面显示“**MCP 服务端启动并已连接**”。
 5. 如果仍然没有监听，重新启动 MasterGo 桌面客户端进行初始化。
 
@@ -349,7 +349,7 @@ kill <mgmcp_PID>
 
 1. 完全退出 MasterGo 桌面客户端。
 2. 重新启动 MasterGo 桌面客户端，重新建立本地 MCP 服务。
-3. 在 MasterGo Web 客户端中重新打开目标文件，并确认显示“MCP 服务端启动并已连接”。
+3. 在 MasterGo 桌面客户端或 Web 客户端中重新打开目标文件，并确认显示“MCP 服务端启动并已连接”。
 4. 完全退出并重新打开 Agent 客户端。
 5. 再次检查 MCP 版本和连接状态。
 
@@ -379,13 +379,13 @@ kill <mgmcp_PID>
 请依次确认：
 
 - 首次连接时已启动 MasterGo 桌面客户端并建立本地服务
-- 目标文件已在 MasterGo Web 客户端中打开
+- 目标文件已在 MasterGo 桌面客户端或 Web 客户端中打开
 - 文件处于可编辑状态
-- 使用的是 MCP 支持的 MasterGo Web 客户端或 Chrome 环境
+- 使用的是 MCP 支持的 MasterGo 桌面客户端、Web 客户端或 Chrome 环境
 - MasterGo 文件没有断开或失去连接
 - 必要时已重启 MasterGo 和 `mgmcp`
 
-仅在 Agent 客户端的内置浏览器中看到 MasterGo 页面，不一定代表 `mgmcp` 已连接到该画布；应以 MasterGo Web 客户端中显示“MCP 服务端启动并已连接”为准。
+仅在 Agent 客户端的内置浏览器中看到 MasterGo 页面，不一定代表 `mgmcp` 已连接到该画布；应以 MasterGo 桌面客户端或 Web 客户端中显示“MCP 服务端启动并已连接”为准。
 
 ### 8. 前端代码导出失败
 
