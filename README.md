@@ -61,7 +61,20 @@
 
 - Node.js 18 或更高版本
 - `npx`
-- 已打开的 MasterGo 客户端，或连接的 Chrome 中的 MasterGo 文件
+- 首次建立连接时，需要安装并启动 MasterGo 桌面客户端
+- 建立本地连接后，可以在 MasterGo Web 客户端中打开目标文件
+
+### 首次连接说明
+
+根据当前环境的实测经验，首次建立 Vibe MCP 连接时，需要先安装并启动 MasterGo 桌面客户端，由它启动本地 MCP 服务并生成：
+
+```text
+http://localhost:50678
+```
+
+本地服务建立后，不需要再在 MasterGo 桌面客户端中打开目标文件。可以直接在 MasterGo Web 客户端中打开目标文件，并确认页面显示“**MCP 服务端启动并已连接**”，之后即可继续使用 Vibe MCP。
+
+> 以上是当前环境的实测使用方式。MasterGo MCP 服务在桌面客户端、Web 客户端和本地端口之间的具体生命周期机制，官方文档尚未完整说明；如果连接异常，仍建议重新打开桌面客户端进行初始化。
 
 如果尚未安装 Node.js，可以执行：
 
@@ -251,22 +264,23 @@ npx --version
 
 可能原因：
 
-- MasterGo 客户端没有打开
-- MasterGo 文件没有打开
-- 当前文件没有建立 MCP 连接
-- 连接使用的客户端或浏览器不是 MCP 支持的环境
+- 首次使用时，MasterGo 桌面客户端尚未启动本地 MCP 服务
+- 本地服务尚未建立，`http://localhost:50678` 尚未生成或未监听
+- MasterGo Web 客户端中的目标文件尚未建立 MCP 连接
+- 连接使用的 Agent 客户端或浏览器不是 MCP 支持的环境
 
 处理方式：
 
-1. 打开 MasterGo 客户端，或在连接的 Chrome 中打开 MasterGo 文件。
-2. 确认文件处于可编辑状态。
-3. 检查默认端口是否有服务监听：
+1. 首次使用时，安装并启动 MasterGo 桌面客户端，让它建立本地 MCP 服务。
+2. 检查默认端口是否有服务监听：
 
    ```bash
    lsof -i :50678
    ```
 
-4. 如果没有监听，重新打开 MasterGo 文件并等待连接建立。
+3. 在 MasterGo Web 客户端中打开目标文件。
+4. 确认页面显示“**MCP 服务端启动并已连接**”。
+5. 如果仍然没有监听，重新启动 MasterGo 桌面客户端进行初始化。
 
 ### 5. 工具调用成功，但画布没有变化
 
@@ -320,13 +334,14 @@ kill <mgmcp_PID>
 
 请依次确认：
 
-- 目标文件已在 MasterGo 客户端中打开
+- 首次连接时已启动 MasterGo 桌面客户端并建立本地服务
+- 目标文件已在 MasterGo Web 客户端中打开
 - 文件处于可编辑状态
-- 使用的是 MCP 支持的 MasterGo 客户端或 Chrome 环境
+- 使用的是 MCP 支持的 MasterGo Web 客户端或 Chrome 环境
 - MasterGo 文件没有断开或失去连接
 - 必要时已重启 MasterGo 和 `mgmcp`
 
-仅在 Agent 客户端的内置浏览器中看到 MasterGo 页面，不一定代表 `mgmcp` 已连接到该画布。某些环境要求在 MasterGo 客户端或指定的 Chrome 会话中打开同一个文件。
+仅在 Agent 客户端的内置浏览器中看到 MasterGo 页面，不一定代表 `mgmcp` 已连接到该画布；应以 MasterGo Web 客户端中显示“MCP 服务端启动并已连接”为准。
 
 ### 8. 前端代码导出失败
 

@@ -75,8 +75,10 @@ brew install node
 
 **如果 mgmcp 未运行** → 告诉用户:
 ```
-请先打开 MasterGo 客户端/浏览器，并打开任意文件。mgmcp 会自动启动。
+请先安装并启动 MasterGo 桌面客户端，先建立本地 MCP 服务。服务建立后，可以在 MasterGo Web 客户端中打开目标文件，并确认页面显示“MCP 服务端启动并已连接”。
 ```
+
+根据当前环境的实测经验，首次建立 Vibe MCP 连接需要 MasterGo 桌面客户端生成 `http://localhost:50678`；建立本地服务后，不需要再在桌面客户端中打开目标文件，可以继续使用 MasterGo Web 客户端。桌面客户端、Web 客户端和本地服务之间的具体生命周期机制尚未由官方文档完整说明，连接异常时建议重新启动桌面客户端进行初始化。
 
 **如果 Codex Desktop 原生配置或通用 `.mcp.json` 缺失/错误** → 使用本 skill 的安装脚本。先向用户说明将修改的路径、保留现有配置且会创建备份，并说明首次启动时 `npx -y` 可能下载 `@mastergo/vibe-mcp`，得到明确确认后再执行：
 
@@ -258,10 +260,10 @@ kill <mgmcp_PID>
 | unknown MCP server | Codex 当前会话未加载 mastergo server；或只写了通用 .mcp.json，Codex Desktop 未读到 | 优先检查并写入 `~/.codex/config.toml` 的 `[mcp_servers.mastergo]`，重启 Codex 后重试；仅当当前无法重启且必须完成操作时才临时走管道调用 |
 | list_mcp_resources 返回 Method not found | MasterGo Vibe MCP 不实现 resources/list | 不算失败；用 `tool_search("mastergo")` 或 `mcp__mastergo__get_version` 验证原生工具 |
 | tool_search 能看到 mcp__mastergo 但 get_selection_node 返回 NoSelection | 画布在线，但当前没有选中图层 | 让用户在 MasterGo 画布中选中一个图层/根节点后重试，或传 targetNodeId |
-| no online mg canvas | mgmcp 未连接到在线 MasterGo 画布；可能打开在非 mgmcp 绑定的浏览器/窗口 | 确认 MasterGo 客户端或绑定 Chrome 中打开文件并连接；必要时重启 MasterGo 客户端和 mgmcp |
-| in-app browser 能看到文件但 MCP 报 no online mg canvas | mgmcp 通常通过 MasterGo 客户端/Chrome 扩展连接，未必绑定 Codex in-app browser | 在 MasterGo 客户端或 Chrome 中打开同一文件并恢复连接；不要只依赖 in-app browser 可见状态 |
+| no online mg canvas | mgmcp 未连接到在线 MasterGo 画布；可能尚未完成首次桌面客户端初始化，或 Web 文件尚未显示已连接 | 首次使用时启动 MasterGo 桌面客户端建立 `http://localhost:50678`；之后在 MasterGo Web 客户端打开文件，并确认页面显示“MCP 服务端启动并已连接” |
+| in-app browser 能看到文件但 MCP 报 no online mg canvas | Agent 内置浏览器看到文件，不代表 mgmcp 已连接到该画布 | 优先在 MasterGo Web 客户端打开同一文件并确认“MCP 服务端启动并已连接”；首次连接异常时重新启动 MasterGo 桌面客户端 |
 | `Unsupported protocol localhost:` | --url 缺 http:// | 改为 `--url=http://localhost:50678` |
-| 50678 端口无 mgmcp 监听 | MasterGo 本地服务未启动，或端口自动切换 | 启动 MasterGo 客户端并打开文件；若实际端口变化，更新 `--url=http://localhost:<port>` |
+| 50678 端口无 mgmcp 监听 | MasterGo 本地服务未启动，或端口自动切换 | 首次使用时启动 MasterGo 桌面客户端初始化本地服务；若实际端口变化，更新 `--url=http://localhost:<port>` |
 | get_selection_node 报缺参数 | projectDir 必填 | 传工作区绝对路径 |
 | ERR_MODULE_NOT_FOUND: zod | pnpm/npm 冲突 | rm node_modules && npm install |
 | 写工具返回 isError=false 但画布无变化 | 管道模式工具 bug | 改用 agent_update_node 写入 |
@@ -269,8 +271,8 @@ kill <mgmcp_PID>
 | 完整页面写入后顶栏/底栏上下颠倒 | agent_update_node 重建已有根节点完整子树时可能出现直接子节点顺序异常 | 用 get_selection_node 检查根节点直接子节点 data-name 顺序；用 agent_replace_node + 正常顺序完整 HTML 替换 |
 | 本地图片路径导致写入失败 | HTML 引用了不存在的 ./asset/... 文件 | 确保图片真实存在于 projectDir 内，或先生成/复制到 asset/images 后再传 projectDir |
 | submit_page_to_canvas 返回规则文本 | 管道模式 auto-load 吞结果 | 用 agent_update_node 替代，或重启 Codex 走原生 MCP |
-| design_page 报"占位层启动失败" | mgmcp 守护进程状态腐化 | 杀掉 mgmcp 进程后重新打开 MasterGo 客户端 |
-| mgmcp 在但写工具全部超时 | mgmcp 连接泄漏/卡死 | `kill <mgmcp_PID>` → 重新打开 MasterGo 客户端 |
+| design_page 报"占位层启动失败" | mgmcp 守护进程状态腐化 | 杀掉 mgmcp 进程后重新打开 MasterGo 桌面客户端进行初始化，再在 Web 客户端打开目标文件 |
+| mgmcp 在但写工具全部超时 | mgmcp 连接泄漏/卡死 | `kill <mgmcp_PID>` → 重新打开 MasterGo 桌面客户端进行初始化，再在 Web 客户端恢复目标文件连接 |
 | 创建组件后 Assets 面板看不到 | agent_create_component 在管道模式不生效 | 改用 agent_update_node 在画布放置，或重启 Codex 走原生 MCP |
 
 ## 已知限制
