@@ -1,0 +1,7 @@
+interface:
+  display_name: "MasterGo MCP"
+  short_description: "连接并操作 MasterGo Vibe MCP 画布"
+  default_prompt: "使用 $mastergo-mcp 检查连接，并继续完成当前 MasterGo 画布任务。"
+
+policy:
+  allow_implicit_invocation: true
