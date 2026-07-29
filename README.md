@@ -8,6 +8,7 @@
 
 - [功能概览](#功能概览)
 - [触发条件](#触发条件)
+- [下载与安装](#下载与安装)
 - [安装与配置](#安装与配置)
 - [使用方法](#使用方法)
 - [连接模式](#连接模式)
@@ -52,6 +53,48 @@
 ```
 
 仅说“设计一个页面”而没有提到 MasterGo 时，通常不会触发此 skill。
+
+## 下载与安装
+
+### 直接下载资源包
+
+可以直接下载 GitHub 源码压缩包：
+
+[下载最新源码 ZIP](https://github.com/HicyWon/mastergo-mcp-skill/archive/refs/heads/main.zip)
+
+当前仓库暂未创建 GitHub Release 或 Packages，这不影响用户直接下载源码 ZIP 或使用下面的命令获取 skill；该链接始终指向 `main` 分支的最新版本。
+
+也可以使用 Git 克隆：
+
+```bash
+git clone --depth 1 https://github.com/HicyWon/mastergo-mcp-skill.git
+```
+
+skill 位于下载内容中的：
+
+```text
+mastergo-mcp/
+```
+
+该目录必须作为一个整体安装，因为其中包含 `SKILL.md`、Agent 显示配置和 MCP 配置脚本。
+
+### Codex 直接安装
+
+如果本机已安装 Codex skill installer，可以直接执行：
+
+```bash
+python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --url https://github.com/HicyWon/mastergo-mcp-skill \
+  --path mastergo-mcp
+```
+
+安装完成后，在 Codex 中提到 MasterGo、MCP 或画布操作即可触发此 skill。
+
+### Claude Code 和其他 Agent 客户端
+
+Claude Code 以及其他支持 skill / MCP 的 Agent 客户端可以先使用 `git clone` 或源码 ZIP 获取资源，再按照对应客户端的 skill 安装规则，将完整的 `mastergo-mcp` 目录放入客户端的 skills 目录。
+
+不同客户端的 skills 目录和自动安装命令可能不同，本仓库不假设 Claude Code 或其他 Agent 客户端使用 Codex 的目录结构。安装 skill 后，还需要按照客户端的 MCP 配置方式接入 `@mastergo/vibe-mcp`。
 
 ## 安装与配置
 
@@ -114,7 +157,7 @@ http://localhost:50678
 bash mastergo-mcp/scripts/setup-mastergo-mcp.sh --yes --port 50678
 ```
 
-脚本主要面向 Codex Desktop，同时提供通用 MCP JSON 配置。Claude Code 等其他支持 MCP 的客户端可以复用本 skill 的工作流，具体配置入口请以对应客户端的 MCP 配置方式为准。
+脚本主要面向 Codex Desktop，同时提供可供其他 MCP 客户端参考的通用 JSON 配置。Claude Code 等其他支持 MCP 的客户端可以复用本 skill 的工作流，但应使用各自的 MCP 配置入口。
 
 脚本会更新：
 
@@ -127,7 +170,7 @@ bash mastergo-mcp/scripts/setup-mastergo-mcp.sh --yes --port 50678
 
 ## 使用方法
 
-使用前请打开 MasterGo 文件或画布，并确认 MCP 已连接。以下示例中的引号内容就是可以直接输入给 Agent 的指令。
+首次使用请先按“首次连接说明”建立本地 MCP 服务；之后在 MasterGo Web 客户端打开目标文件，并确认 MCP 已连接。以下示例中的引号内容就是可以直接输入给 Agent 的指令。
 
 | 使用场景 | 可以做什么 | 用户输入示例 |
 | --- | --- | --- |
@@ -304,10 +347,11 @@ kill <mgmcp_PID>
 
 然后按以下顺序恢复：
 
-1. 完全退出 MasterGo 客户端。
-2. 重新打开 MasterGo 客户端和目标文件。
-3. 完全退出并重新打开 Agent 客户端。
-4. 再次检查 MCP 版本和连接状态。
+1. 完全退出 MasterGo 桌面客户端。
+2. 重新启动 MasterGo 桌面客户端，重新建立本地 MCP 服务。
+3. 在 MasterGo Web 客户端中重新打开目标文件，并确认显示“MCP 服务端启动并已连接”。
+4. 完全退出并重新打开 Agent 客户端。
+5. 再次检查 MCP 版本和连接状态。
 
 仅刷新浏览器页面通常不会重启 `mgmcp`。
 
