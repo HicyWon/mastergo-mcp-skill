@@ -13,7 +13,7 @@ description: >
 
 默认示例以 Codex 为 Agent 客户端，但本 skill 的 MCP 工作流也适用于 Claude Code 及其他支持 MCP 的 Agent 客户端。具体配置入口以客户端的 MCP 配置方式为准；本 skill 自带的 Codex 配置脚本主要面向 Codex Desktop，并同时提供通用 MCP JSON 配置。
 
-> Skill 版本：**1.1** (2026-07-10T14:30:00+08:00)
+> Skill 版本：**1.2** (2026-07-29T00:00:00+08:00)
 
 ## 操作原则
 
@@ -161,6 +161,34 @@ echo '{"jsonrpc":"2.0","method":"initialize","params":{"protocolVersion":"2025-0
    → 写入成功，画布可见
 ```
 `agent_update_node` 是管道模式下已验证可用的局部修改首选路径；写入完整根节点子树后必须用 `get_selection_node` 拉取复核。
+
+#### MasterGo FontAwesome 图标兼容性（v1.0.18 实证）
+
+自动加载的 `page-generate` 规则可能建议 FontAwesome；不要把它的推荐视为目标端能力保证。@mastergo/vibe-mcp v1.0.18 已验证：`far` 图标会在画布中退化为同一个圆形本地占位 SVG，且部分版本敏感名称（例如 `fa-grid-2`）也可能无法转换。页面提交成功、根节点存在或背景正常都不表示图标成功。
+
+- 不要默认用 `far` 表示未选中态；选中与未选中态可通过颜色、透明度、描边或容器样式区分，不要切换到未经验证的 FontAwesome 前缀。
+- 仅使用当前 MCP/画布版本已验证可渲染的 FontAwesome 前缀和名称。优先使用以下保守候选集；它们是 v1.0.18 的已验证回退，不是 MasterGo 原生矢量能力声明：
+
+| 语义 | 已验证回退 |
+| --- | --- |
+| home | `fas fa-house` |
+| navigation | `fas fa-location-arrow` |
+| media | `fas fa-music` |
+| phone | `fas fa-phone` |
+| climate | `fas fa-fan` |
+| vehicle | `fas fa-car` |
+| apps | `fas fa-th` |
+| turn | `fas fa-turn-up` |
+
+- 对不在候选集内的名称，先在当前画布进行一次可回读的小范围验证，确认后才能加入本次映射；不要猜测图标名可用，也不要用 `fa-grid-2` 代替 `fas fa-th`。
+- 对含两个或以上不同语义图标的页面，写入后必须执行：
+  1. 用返回的 root ID 调用 `get_selection_node`；
+  2. 为每个图标节点记录实际 SVG/image 资源路径；
+  3. 若不同语义图标复用同一个 `./asset/icons/svg_*.svg`，将其判定为图标解析失败/占位符回退；
+  4. 调用 `get_screenshot`，确认每个 Dock、工具栏或重复控制图标在视觉上可区分。
+- 发生占位符回退时，使用 `agent_replace_node` 替换故障图标节点为已验证的 `fas` 回退，再做一次 root readback 和截图确认。不要用 `agent_update_node` 修改已经被转换为 `img` 的故障图标。
+- 不允许静默保留空圆、重复图标或未验证占位符。只有结构回读不存在不同语义复用同一占位 SVG，且截图中全部图标可区分时，才能报告完成。
+- 完成报告必须包含实际 MCP 版本、每个 FontAwesome fallback、未验证或阻塞的图标，并明确 SVG/image 回读结果不代表 MasterGo 原生可编辑矢量。
 
 **任务2：读取并修改已有图层（已验证）**
 ```
