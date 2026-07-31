@@ -1,0 +1,7 @@
+.DS_Store
+.mastergo/
+backups/
+handoff.md
+samples/
+scripts/__pycache__/
+*.pyc

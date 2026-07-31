@@ -1,8 +1,15 @@
-# MasterGo MCP Skill
+# Skills Release
 
-用于在 Codex、Claude Code 以及其他支持 MCP 的 Agent 客户端中连接并操作 MasterGo Vibe MCP 画布的 skill。
+用于发布和维护多个 Codex / Agent skill 的仓库。当前包含 MasterGo Vibe MCP 与 image-to-ui 两个 skill。
 
-A skill for connecting Codex, Claude Code, and other MCP-compatible agent clients to read, generate, modify, and synchronize MasterGo Vibe MCP canvases.
+A release repository for Codex, Claude Code, and other compatible Agent skills. It currently contains the MasterGo Vibe MCP skill and the image-to-ui skill.
+
+## 仓库中的 skills
+
+- `mastergo-mcp/`：连接并操作 MasterGo Vibe MCP 画布。
+- `image-to-ui/`：将草图、截图、照片或 brief 转换为可编辑 UI 原稿，并输出 HTML、MasterGo 或 Figma 版本。
+
+每个子目录都是独立可安装的 skill。安装时应将所需子目录作为 skill 根目录，不要把整个仓库直接当作单个 skill 安装。
 
 [GitHub 仓库](https://github.com/HicyWon/mastergo-mcp-skill) · [MasterGo MCP 官方文档](https://mastergo.com/help/MG/MCP/VIBE)
 
@@ -91,6 +98,18 @@ python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-githu
 ### Claude Code 和其他 Agent 客户端
 
 获取仓库后，将 `mastergo-mcp/` 安装至客户端的 skills 目录，并按照客户端的 MCP 配置方式注册 `@mastergo/vibe-mcp`。
+
+### image-to-ui
+
+使用 image-to-ui 时，将 `image-to-ui/` 安装至客户端的 skills 目录：
+
+```bash
+python3 ~/.codex/skills/.system/skill-installer/scripts/install-skill-from-github.py \
+  --url https://github.com/HicyWon/mastergo-mcp-skill \
+  --path image-to-ui
+```
+
+也可以直接从仓库中复制 `image-to-ui/` 目录。其本地 HTML、资产和 validator 规则以该子目录为准。
 
 ## 安装与配置
 
@@ -425,6 +444,12 @@ kill <mgmcp_PID>
 │   ├── SKILL.md
 │   ├── agents/openai.yaml
 │   └── scripts/setup-mastergo-mcp.sh
+├── image-to-ui/
+│   ├── SKILL.md
+│   ├── agents/openai.yaml
+│   ├── references/
+│   ├── scripts/
+│   └── assets/
 ├── README.md
 ├── agents.md
 ├── LICENSE
